@@ -5,25 +5,31 @@ import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/")({
   component: function RouteComponent() {
-    function onClick(): void {
-      console.log("clicked")
+    function onSubmit(event: React.SubmitEvent<HTMLFormElement>): void {
+      event.preventDefault()
+
+      const formData = new FormData(event.currentTarget)
+      const email = formData.get("email") as string
+      const password = formData.get("password") as string
+
+      console.log(email, password)
     }
 
     return (
       <Column className="h-dvh items-center justify-center">
-        <Column className="w-full max-w-320">
+        <form className="flex w-full max-w-320 flex-col gap-4" onSubmit={onSubmit}>
           <Label htmlFor="email">Email</Label>
           <Spacer height={4} />
-          <Input id="email" type="email" value="larry@example.com" />
+          <Input defaultValue="larry@example.com" id="email" type="email" />
           <Spacer height={16} />
 
           <Label htmlFor="password">Password</Label>
           <Spacer height={4} />
-          <Input id="password" type="text" value="password" />
+          <Input defaultValue="password" id="password" type="text" />
 
           <Spacer height={24} />
-          <Button isFullWidth label="Login" onClick={onClick} size={48} />
-        </Column>
+          <Button isFullWidth label="Login" size={48} />
+        </form>
       </Column>
     )
   },
