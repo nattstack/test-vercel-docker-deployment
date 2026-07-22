@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1.7
 #
-# Vercel container image for the TanStack Start app.
-# Detected automatically when present at the project root:
-# https://vercel.com/docs/functions/container-images
+# Runtime image for the TanStack Start app.
 #
 # Build context: the repo root. Nitro emits the production server bundle into
 # `.output/`, which is the only build artifact copied into the runtime image.
@@ -27,11 +25,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
-# Vercel routes traffic to port 80 by default.
-ENV PORT=80
+ENV PORT=3000
 
 COPY --from=build /app/.output ./.output
 
-EXPOSE 80
+EXPOSE 3000
 
 CMD ["bun", ".output/server/index.mjs"]
