@@ -79,10 +79,10 @@ const LINK_TAGS: LinkTagGroups = {
 }
 
 const META = {
-  DESCRIPTION: "Donut.",
-  IMAGE_ALT: "Donut",
+  DESCRIPTION: "Test",
+  IMAGE_ALT: "Test",
   IMAGE_URL: `${BASE_URL}/assets/og-image.png`,
-  TITLE: "Donut",
+  TITLE: "Test",
   URL: BASE_URL,
 }
 
