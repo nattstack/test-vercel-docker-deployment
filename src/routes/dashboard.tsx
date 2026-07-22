@@ -69,7 +69,7 @@ export const Route = createFileRoute("/dashboard")({
             <div className="w-full overflow-x-auto">
               <table className="w-full border-collapse text-left text-14">
                 <thead>
-                  <tr className="border-b border-gray-6">
+                  <tr className="border-b border-border">
                     <th className="font-medium px-8 py-10">Name</th>
                     <th className="font-medium px-8 py-10">Email</th>
                     <th className="font-medium px-8 py-10">Last active</th>
@@ -77,7 +77,7 @@ export const Route = createFileRoute("/dashboard")({
                 </thead>
                 <tbody>
                   {analytics.map((row) => (
-                    <tr className="border-b border-gray-6" key={row.userId}>
+                    <tr className="border-b border-border" key={row.userId}>
                       <td className="px-8 py-10 text-gray-12">{row.name}</td>
                       <td className="px-8 py-10 text-gray-11">{row.email}</td>
                       <td className="px-8 py-10 text-gray-11">
