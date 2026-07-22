@@ -58,14 +58,7 @@ export const Route = createFileRoute("/sign-up")({
             </>
           )}
 
-          <Button
-            isDisabled={isSubmitting}
-            isFullWidth
-            isLoading={isSubmitting}
-            label="Sign up"
-            size={48}
-            type="submit"
-          />
+          <Button isFullWidth isLoading={isSubmitting} label="Sign up" size={48} type="submit" />
           <Spacer height={12} />
 
           <ButtonLink

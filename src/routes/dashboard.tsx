@@ -107,13 +107,11 @@ export const Route = createFileRoute("/dashboard")({
           )}
 
           <Button
-            isDisabled={isSubmitting}
             isFullWidth
             isLoading={isSubmitting}
             label="Sign out"
             onClick={onSignOut}
-            size={48}
-            type="button"
+            variant="secondary"
           />
         </Column>
       </Column>
