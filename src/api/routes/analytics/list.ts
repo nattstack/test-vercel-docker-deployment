@@ -45,10 +45,7 @@ export const routeAnalyticsList = new Elysia().get(
       .orderBy(desc(ANALYTICS.lastActiveAt))
 
     return {
-      analytics: rows.map((row) => ({
-        ...row,
-        lastActiveAt: row.lastActiveAt.toISOString(),
-      })),
+      analytics: rows.map((row) => (Object.assign(row, { lastActiveAt: row.lastActiveAt.toISOString() }))),
     }
   },
   {
