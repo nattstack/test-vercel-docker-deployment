@@ -66,14 +66,28 @@ export const PROFILE = pgTable("profile", {
     .references(() => USER.id, { onDelete: "cascade" }),
 })
 
+export const SESSION = pgTable("session", {
+  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
+  expiresAt: timestamp({ mode: "string" }).notNull(),
+  id: uuid()
+    .default(sql`uuidv7()`)
+    .primaryKey(),
+  tokenHash: text().unique().notNull(),
+  userId: uuid()
+    .notNull()
+    .references(() => USER.id, { onDelete: "cascade" }),
+})
+
 export type Account = typeof ACCOUNT.$inferSelect
 export type EmailVerificationToken = typeof EMAIL_VERIFICATION_TOKEN.$inferSelect
 export type PasswordResetToken = typeof PASSWORD_RESET_TOKEN.$inferSelect
 export type Profile = typeof PROFILE.$inferSelect
+export type Session = typeof SESSION.$inferSelect
 export type User = typeof USER.$inferSelect
 
 export const schemaSelectAccount = createSelectSchema(ACCOUNT)
 export const schemaSelectEmailVerificationToken = createSelectSchema(EMAIL_VERIFICATION_TOKEN)
 export const schemaSelectPasswordResetToken = createSelectSchema(PASSWORD_RESET_TOKEN)
 export const schemaSelectProfile = createSelectSchema(PROFILE)
+export const schemaSelectSession = createSelectSchema(SESSION)
 export const schemaSelectUser = createSelectSchema(USER)
