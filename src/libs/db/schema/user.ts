@@ -45,10 +45,10 @@ export const ANALYTICS = pgTable("analytics", {
 export const EMAIL_VERIFICATION_TOKEN = pgTable("email_verification_token", {
   createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
   expiresAt: timestamp({ mode: "string" }).notNull(),
+  hash: text().unique().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
-  token: text().unique().notNull(),
   userId: uuid()
     .notNull()
     .references(() => USER.id, { onDelete: "cascade" }),
@@ -57,10 +57,10 @@ export const EMAIL_VERIFICATION_TOKEN = pgTable("email_verification_token", {
 export const PASSWORD_RESET_TOKEN = pgTable("password_reset_token", {
   createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
   expiresAt: timestamp({ mode: "string" }).notNull(),
+  hash: text().unique().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
-  token: text().unique().notNull(),
   userId: uuid()
     .notNull()
     .references(() => USER.id, { onDelete: "cascade" }),
