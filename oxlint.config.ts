@@ -59,6 +59,8 @@ export default defineConfig({
     "eslint/no-use-before-define": "allow",
     "eslint/no-warning-comments": "allow", // Don't mind `TODO:` comments
     "eslint/sort-imports": "allow", // Conflicts with oxfmt
+    "jsdoc/require-param-type": "allow", // Types live in TypeScript signatures
+    "jsdoc/require-returns-type": "allow", // Types live in TypeScript signatures
     "jsx-a11y/no-autofocus": "allow", // Allow autofocus for input fields
     "oxc/no-async-await": "allow",
     "oxc/no-optional-chaining": "allow",
