@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
 
     return (
       <Column className="h-dvh items-center justify-center">
-        <form className="flex w-full max-w-320 flex-col gap-4" onSubmit={onSubmit}>
+        <form className="flex w-full max-w-320 flex-col" onSubmit={onSubmit}>
           <Label htmlFor="email">Email</Label>
           <Spacer height={4} />
           <Input defaultValue="larry@example.com" id="email" name="email" type="email" />
