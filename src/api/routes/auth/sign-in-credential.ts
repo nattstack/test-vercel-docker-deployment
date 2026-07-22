@@ -36,7 +36,7 @@ export const routeSignInCredential = new Elysia().post(
       return status(HTTP_STATUS_CODE["401_UNAUTHORIZED"], { error: "Invalid email or password" })
     }
 
-    await createSession(row.user.id, cookie[SESSION_COOKIE_NAME])
+    await createSession(cookie[SESSION_COOKIE_NAME], row.user.id)
 
     await db
       .update(USER)

@@ -9,8 +9,8 @@ const HEX_PAD_LENGTH = 2
 const RADIX_HEX = 16
 
 export async function createSession(
-  userId: string,
   cookie: Cookie<string | undefined>,
+  userId: string,
 ): Promise<void> {
   const sessionSecret = createSessionSecret()
   const sessionSecretHash = await hashSessionSecret(sessionSecret)

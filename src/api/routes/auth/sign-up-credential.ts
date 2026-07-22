@@ -64,7 +64,7 @@ export const routeSignUpCredential = new Elysia().post(
       return createdUser
     })
 
-    await createSession(user.id, cookie[SESSION_COOKIE_NAME])
+    await createSession(cookie[SESSION_COOKIE_NAME], user.id)
 
     return {
       user: {
