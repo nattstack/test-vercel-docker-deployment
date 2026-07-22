@@ -14,7 +14,14 @@ function formatLastActiveAt(lastActiveAt: null | string | undefined): string {
     return "Never"
   }
 
-  return new Date(lastActiveAt).toLocaleString()
+  return new Date(lastActiveAt).toLocaleString("en-US", {
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    month: "long",
+    second: "2-digit",
+    year: "numeric",
+  })
 }
 
 export const Route = createFileRoute("/dashboard")({
@@ -70,9 +77,9 @@ export const Route = createFileRoute("/dashboard")({
               <table className="w-full border-collapse text-left text-14">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="font-medium px-8 py-10">Name</th>
-                    <th className="font-medium px-8 py-10">Email</th>
-                    <th className="font-medium px-8 py-10">Last active</th>
+                    <th className="px-8 py-10 font-500 text-text-primary">Name</th>
+                    <th className="px-8 py-10 font-500 text-text-primary">Email</th>
+                    <th className="px-8 py-10 font-500 text-text-primary">Last active</th>
                   </tr>
                 </thead>
                 <tbody>
