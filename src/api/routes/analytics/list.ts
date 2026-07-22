@@ -33,7 +33,7 @@ export const routeAnalyticsList = new Elysia().get(
       return status(HTTP_STATUS_CODE["401_UNAUTHORIZED"], { error: "Unauthorized" })
     }
 
-    const analytics = await db
+    const rows = await db
       .select({
         email: USER.email,
         lastActiveAt: ANALYTICS.lastActiveAt,
@@ -44,7 +44,12 @@ export const routeAnalyticsList = new Elysia().get(
       .innerJoin(USER, eq(ANALYTICS.userId, USER.id))
       .orderBy(desc(ANALYTICS.lastActiveAt))
 
-    return { analytics }
+    return {
+      analytics: rows.map((row) => ({
+        ...row,
+        lastActiveAt: row.lastActiveAt.toISOString(),
+      })),
+    }
   },
   {
     cookie: sessionCookieSchema,

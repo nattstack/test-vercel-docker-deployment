@@ -35,7 +35,7 @@ export async function createSession(
 ): Promise<void> {
   const sessionSecret = createSessionSecret()
   const sessionSecretHash = await hashSessionSecret(sessionSecret)
-  const expiresAt = getSessionExpiresAt().toISOString()
+  const expiresAt = getSessionExpiresAt()
 
   await db.insert(SESSION).values({
     expiresAt,
@@ -83,7 +83,7 @@ export async function findUserBySessionSecret(
   }
 
   const sessionSecretHash = await hashSessionSecret(sessionSecret)
-  const now = new Date().toISOString()
+  const now = new Date()
 
   const [row] = await db
     .select({ user: USER })

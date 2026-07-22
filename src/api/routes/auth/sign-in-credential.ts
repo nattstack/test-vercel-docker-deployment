@@ -38,7 +38,7 @@ export const routeSignInCredential = new Elysia().post(
 
     await createSession(cookie[COOKIE_NAME_SESSION], row.user.id)
 
-    const lastActiveAt = new Date().toISOString()
+    const lastActiveAt = new Date()
 
     await db
       .insert(ANALYTICS)

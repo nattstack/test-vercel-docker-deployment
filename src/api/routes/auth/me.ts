@@ -43,7 +43,7 @@ export const routeMe = new Elysia().get(
 
     return {
       analytics: {
-        lastActiveAt: analytics?.lastActiveAt ?? undefined,
+        lastActiveAt: analytics?.lastActiveAt.toISOString() ?? undefined,
       },
       user: {
         email: user.email,
