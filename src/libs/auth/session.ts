@@ -1,30 +1,9 @@
 /**
- * Server-side session helpers.
+ * Cookie-based session management.
  *
- * Model:
- * - The browser cookie holds the raw session secret (bearer token).
- * - The database stores only SHA-256(secret). Lookup hashes the cookie and
- *   matches `SESSION.hash`.
- *
- * Why secret and hash are different:
- * - If the DB leaks and we stored the raw secret, every active session could be
- *   hijacked by replaying those values as cookies.
- * - With hashes only, a DB leak does not yield usable cookies. Attackers would
- *   need to reverse/brute-force each high-entropy secret (effectively impossible).
- * - Same idea as passwords: never store the credential that grants access.
- *   Session secrets are random, so fast SHA-256 is enough; passwords use slow
- *   hashing (argon2) because they are guessable.
- *
- * Why no extra libraries here:
- * - `crypto.getRandomValues` is the platform CSPRNG (same class as
- *   `openssl rand` / `crypto.randomBytes`). Most "secure random string"
- *   packages wrap this API; they do not add entropy.
- * - `crypto.subtle.digest("SHA-256")` is the correct primitive for hashing a
- *   high-entropy token. A library does not make SHA-256 stronger.
- *
- * Cookie clearing: callers pass the session `Cookie` instance
- * (`cookie[COOKIE_NAME_SESSION]`), not the whole jar. `clearCookieSession` only
- * clears that one cookie.
+ * Each session is identified by an opaque random secret stored in an httpOnly
+ * cookie. Only the SHA-256 hash of that secret is persisted in the SESSION
+ * table, so leaked database rows cannot be replayed as valid cookie values.
  */
 
 import { and, eq, gt } from "drizzle-orm"
@@ -33,17 +12,22 @@ import { clearCookieSession, getSessionExpiresAt, setCookieSession } from "#/lib
 import { db } from "#/libs/db/db"
 import { SESSION, USER, type User } from "#/libs/db/schema/user"
 
-/** 32 bytes = 256 bits of entropy (same strength as `openssl rand -hex 32`). */
+/** Number of random bytes in a session secret (256 bits of entropy). */
 const SESSION_SECRET_BYTE_LENGTH = 32
+/** Width of one byte rendered as hex, used for zero-padding (e.g. 0xa -> "0a"). */
 const HEX_PAD_LENGTH = 2
+/** Base 16, used when converting digest bytes to a hex string. */
 const RADIX_HEX = 16
 
 /**
- * Creates a session: persist hash + expiry in DB, set the raw secret on the cookie.
- * If the DB insert fails, the cookie is never set (insert runs first).
+ * Creates a new session for the given user.
  *
- * @param cookie - Session cookie instance (`cookie[COOKIE_NAME_SESSION]`), not the jar.
- * @param userId - User id to attach the session to.
+ * Generates a random session secret, stores its SHA-256 hash in the SESSION
+ * table alongside an expiry date, and writes the plaintext secret to the
+ * session cookie.
+ *
+ * @param cookie - Session cookie to write the new secret to.
+ * @param userId - ID of the user the session belongs to.
  */
 export async function createSession(
   cookie: Cookie<string | undefined>,
@@ -63,11 +47,12 @@ export async function createSession(
 }
 
 /**
- * Deletes the DB row for the current cookie (when present) and clears the cookie.
- * If the cookie is already missing, the DB delete is skipped — the row can only be
- * identified via the secret.
+ * Deletes the session referenced by the session cookie (i.e. logout).
  *
- * @param cookie - Session cookie instance (`cookie[COOKIE_NAME_SESSION]`), not the jar.
+ * Removes the matching row from the SESSION table when the cookie holds a
+ * secret, and clears the cookie in all cases.
+ *
+ * @param cookie - Session cookie holding the current session secret.
  */
 export async function deleteSession(cookie: Cookie<string | undefined>): Promise<void> {
   const sessionSecret = cookie.value
@@ -81,10 +66,14 @@ export async function deleteSession(cookie: Cookie<string | undefined>): Promise
 }
 
 /**
- * Resolves the user for a raw session secret.
+ * Looks up the user that owns the session matching the given secret.
  *
- * @param sessionSecret - Raw secret from the cookie, or `undefined` if absent.
- * @returns The matching user, or `undefined` if missing, unknown, or expired.
+ * Hashes the secret and searches for a session with that hash that has not
+ * yet expired. Expired sessions are filtered out by the query, not deleted.
+ *
+ * @param sessionSecret - Plaintext session secret, typically read from the cookie.
+ * @returns The session's user, or `undefined` if the secret is missing,
+ *   unknown, or the session has expired.
  */
 export async function findUserBySessionSecret(
   sessionSecret: string | undefined,
@@ -107,12 +96,13 @@ export async function findUserBySessionSecret(
 }
 
 /**
- * Loads the user from the session cookie. Clears a stale/invalid cookie so the
- * client does not keep sending a useless value. Does not delete expired DB rows
- * here (no expiry cleanup job in this path).
+ * Resolves the currently authenticated user from the session cookie.
  *
- * @param cookie - Session cookie instance (`cookie[COOKIE_NAME_SESSION]`), not the jar.
- * @returns The authenticated user, or `undefined` if the session is invalid.
+ * When the session is invalid (no cookie, unknown secret, or expired), any
+ * stale cookie is cleared so the client stops sending a dead secret.
+ *
+ * @param cookie - Session cookie from the incoming request.
+ * @returns The authenticated user, or `undefined` when the session is invalid.
  */
 export async function resolveSessionUser(
   cookie: Cookie<string | undefined>,
@@ -120,6 +110,7 @@ export async function resolveSessionUser(
   const user = await findUserBySessionSecret(cookie.value)
 
   if (!user) {
+    // The cookie references a session that no longer exists or has expired.
     if (cookie.value) {
       clearCookieSession(cookie)
     }
@@ -131,15 +122,9 @@ export async function resolveSessionUser(
 }
 
 /**
- * Generates the cookie session secret.
+ * Generates a cryptographically random session secret.
  *
- * - `getRandomValues`: cryptographically secure random (not `Math.random()`).
- * - 32 bytes: 256 bits of entropy.
- * - `base64url`: cookie/URL-safe encoding (`-`/`_` instead of `+`/`/`), more
- *   compact than hex (~43 chars vs 64 for the same bytes). Encoding choice does
- *   not affect security — only representation.
- *
- * @returns A base64url-encoded random secret for the session cookie.
+ * @returns 32 random bytes encoded as base64url (cookie-safe, unpadded).
  */
 function createSessionSecret(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(SESSION_SECRET_BYTE_LENGTH))
@@ -147,17 +132,17 @@ function createSessionSecret(): string {
 }
 
 /**
- * Hashes a session secret for DB storage/lookup (SHA-256, hex-encoded).
- * Deterministic: the same cookie value always produces the same hash for queries.
+ * Hashes a session secret with SHA-256 for storage and lookup in the database.
  *
- * @param sessionSecret - Raw session secret from the cookie.
- * @returns Hex-encoded SHA-256 digest stored in `SESSION.hash`.
+ * @param sessionSecret - Plaintext session secret to hash.
+ * @returns The digest as a lowercase hex string (64 characters).
  */
 async function hashSessionSecret(sessionSecret: string): Promise<string> {
   const encoded = new TextEncoder().encode(sessionSecret)
   const digest = await crypto.subtle.digest("SHA-256", encoded)
   const bytes = new Uint8Array(digest)
 
+  // Render each digest byte as two hex characters, e.g. [0x0a, 0xff] -> "0aff".
   return Array.from(bytes, (byte) => byte.toString(RADIX_HEX).padStart(HEX_PAD_LENGTH, "0")).join(
     "",
   )
