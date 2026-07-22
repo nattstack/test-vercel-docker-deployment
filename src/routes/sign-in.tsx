@@ -18,10 +18,12 @@ export const Route = createFileRoute("/sign-in")({
 
     async function onSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
       event.preventDefault()
+
       setError(undefined)
       setIsSubmitting(true)
 
       const { email, password } = getCredentials(event.currentTarget)
+
       const result = await submitCredentials("sign-in-credential", email, password)
 
       if (!result.ok) {
