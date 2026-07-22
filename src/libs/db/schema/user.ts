@@ -35,7 +35,7 @@ export const ANALYTICS = pgTable("analytics", {
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
-  lastActiveAt: timestamp({ mode: "string" }),
+  lastActiveAt: timestamp({ mode: "string" }).defaultNow().notNull(),
   userId: uuid()
     .notNull()
     .unique()
