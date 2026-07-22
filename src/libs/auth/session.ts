@@ -1,6 +1,6 @@
 import { and, eq, gt } from "drizzle-orm"
 import type { Cookie } from "elysia"
-import { clearSessionCookie, getSessionExpiresAt, setSessionCookie } from "#/libs/auth/cookie"
+import { clearCookieSession, getSessionExpiresAt, setCookieSession } from "#/libs/auth/cookie"
 import { db } from "#/libs/db/db"
 import { SESSION, USER, type User } from "#/libs/db/schema/user"
 
@@ -22,7 +22,7 @@ export async function createSession(
     userId,
   })
 
-  setSessionCookie(cookie, sessionSecret)
+  setCookieSession(cookie, sessionSecret)
 }
 
 export async function deleteSession(cookie: Cookie<string | undefined>): Promise<void> {
@@ -33,7 +33,7 @@ export async function deleteSession(cookie: Cookie<string | undefined>): Promise
     await db.delete(SESSION).where(eq(SESSION.hash, sessionSecretHash))
   }
 
-  clearSessionCookie(cookie)
+  clearCookieSession(cookie)
 }
 
 export async function findUserBySessionSecret(
@@ -63,7 +63,7 @@ export async function resolveSessionUser(
 
   if (!user) {
     if (cookie.value) {
-      clearSessionCookie(cookie)
+      clearCookieSession(cookie)
     }
 
     return undefined
