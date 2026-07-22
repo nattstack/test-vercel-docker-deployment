@@ -1,0 +1,43 @@
+# ====================================================== #
+# :: Local Postgres ::
+#
+# Prerequisites
+# - Docker Desktop installed and running
+#
+# Start
+# docker compose up -d
+#
+# Stop
+# docker compose down
+#
+# Stop and delete data volume
+# docker compose down -v
+#
+# Connection (also in `.env` as `DATABASE_URL`)
+# postgresql://postgres:postgres@localhost:5432/app
+#
+# Sync schema after Postgres is up
+# bun run db:push
+# ====================================================== #
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: test-vercel-docker-deployment-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  postgres_data:
