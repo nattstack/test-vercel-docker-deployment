@@ -42,30 +42,6 @@ export const ANALYTICS = pgTable("analytics", {
     .references(() => USER.id, { onDelete: "cascade" }),
 })
 
-export const EMAIL_VERIFICATION_TOKEN = pgTable("email_verification_token", {
-  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
-  expiresAt: timestamp({ mode: "string" }).notNull(),
-  hash: text().unique().notNull(),
-  id: uuid()
-    .default(sql`uuidv7()`)
-    .primaryKey(),
-  userId: uuid()
-    .notNull()
-    .references(() => USER.id, { onDelete: "cascade" }),
-})
-
-export const PASSWORD_RESET_TOKEN = pgTable("password_reset_token", {
-  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
-  expiresAt: timestamp({ mode: "string" }).notNull(),
-  hash: text().unique().notNull(),
-  id: uuid()
-    .default(sql`uuidv7()`)
-    .primaryKey(),
-  userId: uuid()
-    .notNull()
-    .references(() => USER.id, { onDelete: "cascade" }),
-})
-
 export const PROFILE = pgTable("profile", {
   createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
   id: uuid()
@@ -91,16 +67,12 @@ export const SESSION = pgTable("session", {
 
 export type Account = typeof ACCOUNT.$inferSelect
 export type Analytics = typeof ANALYTICS.$inferSelect
-export type EmailVerificationToken = typeof EMAIL_VERIFICATION_TOKEN.$inferSelect
-export type PasswordResetToken = typeof PASSWORD_RESET_TOKEN.$inferSelect
 export type Profile = typeof PROFILE.$inferSelect
 export type Session = typeof SESSION.$inferSelect
 export type User = typeof USER.$inferSelect
 
 export const schemaSelectAccount = createSelectSchema(ACCOUNT)
 export const schemaSelectAnalytics = createSelectSchema(ANALYTICS)
-export const schemaSelectEmailVerificationToken = createSelectSchema(EMAIL_VERIFICATION_TOKEN)
-export const schemaSelectPasswordResetToken = createSelectSchema(PASSWORD_RESET_TOKEN)
 export const schemaSelectProfile = createSelectSchema(PROFILE)
 export const schemaSelectSession = createSelectSchema(SESSION)
 export const schemaSelectUser = createSelectSchema(USER)
