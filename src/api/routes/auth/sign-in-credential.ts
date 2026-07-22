@@ -6,7 +6,7 @@ import { verifyPassword } from "#/libs/auth/password"
 import { createSession } from "#/libs/auth/session"
 import { sessionCookieSchema } from "#/libs/auth/session-cookie-schema"
 import { db } from "#/libs/db/db"
-import { ACCOUNT, USER } from "#/libs/db/schema/user"
+import { ACCOUNT, ANALYTICS, USER } from "#/libs/db/schema/user"
 
 const MIN_PASSWORD_LENGTH = 8
 
@@ -38,10 +38,18 @@ export const routeSignInCredential = new Elysia().post(
 
     await createSession(cookie[COOKIE_NAME_SESSION], row.user.id)
 
+    const lastActiveAt = new Date().toISOString()
+
     await db
-      .update(USER)
-      .set({ lastActiveAt: new Date().toISOString() })
-      .where(eq(USER.id, row.user.id))
+      .insert(ANALYTICS)
+      .values({
+        lastActiveAt,
+        userId: row.user.id,
+      })
+      .onConflictDoUpdate({
+        set: { lastActiveAt },
+        target: ANALYTICS.userId,
+      })
 
     return {
       user: {

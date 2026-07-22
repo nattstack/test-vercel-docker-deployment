@@ -6,7 +6,7 @@ import { hashPassword } from "#/libs/auth/password"
 import { createSession } from "#/libs/auth/session"
 import { sessionCookieSchema } from "#/libs/auth/session-cookie-schema"
 import { db } from "#/libs/db/db"
-import { ACCOUNT, PROFILE, USER } from "#/libs/db/schema/user"
+import { ACCOUNT, ANALYTICS, PROFILE, USER } from "#/libs/db/schema/user"
 
 const MIN_PASSWORD_LENGTH = 8
 
@@ -54,6 +54,10 @@ export const routeSignUpCredential = new Elysia().post(
       await tx.insert(ACCOUNT).values({
         password: passwordHash,
         provider: "credentials",
+        userId: createdUser.id,
+      })
+
+      await tx.insert(ANALYTICS).values({
         userId: createdUser.id,
       })
 

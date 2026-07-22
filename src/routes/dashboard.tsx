@@ -9,10 +9,19 @@ import { requireUser } from "#/libs/auth/route-guards"
 import { rpc } from "#/libs/rpc/rpc"
 import { getRpcErrorMessage } from "#/libs/rpc/rpc-error-message"
 
+function formatLastActiveAt(lastActiveAt: null | string | undefined): string {
+  if (!lastActiveAt) {
+    return "Never"
+  }
+
+  return new Date(lastActiveAt).toLocaleString()
+}
+
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: requireUser,
   component: function DashboardRoute(): JSX.Element {
     const { user } = useRouteContext({ from: "/dashboard" })
+    const { analytics } = Route.useLoaderData()
 
     const navigate = useNavigate()
 
@@ -40,8 +49,8 @@ export const Route = createFileRoute("/dashboard")({
     }
 
     return (
-      <Column className="h-dvh items-center justify-center">
-        <Column className="w-full max-w-320">
+      <Column className="min-h-dvh items-center justify-center px-16 py-32">
+        <Column className="w-full max-w-640">
           <p className="font-medium text-16">Dashboard</p>
           <Spacer height={8} />
 
@@ -51,7 +60,36 @@ export const Route = createFileRoute("/dashboard")({
           <p className="text-14 text-gray-11">{user.email}</p>
           <Spacer height={24} />
 
-          <p className="text-14 text-gray-11">This is a dummy dashboard page.</p>
+          <p className="font-medium text-14">User analytics</p>
+          <Spacer height={12} />
+
+          {analytics.length === 0 ? (
+            <p className="text-14 text-gray-11">No analytics yet.</p>
+          ) : (
+            <div className="w-full overflow-x-auto">
+              <table className="w-full border-collapse text-left text-14">
+                <thead>
+                  <tr className="border-b border-gray-6">
+                    <th className="font-medium px-8 py-10">Name</th>
+                    <th className="font-medium px-8 py-10">Email</th>
+                    <th className="font-medium px-8 py-10">Last active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analytics.map((row) => (
+                    <tr className="border-b border-gray-6" key={row.userId}>
+                      <td className="px-8 py-10 text-gray-12">{row.name}</td>
+                      <td className="px-8 py-10 text-gray-11">{row.email}</td>
+                      <td className="px-8 py-10 text-gray-11">
+                        {formatLastActiveAt(row.lastActiveAt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
           <Spacer height={24} />
 
           {error && (
@@ -73,5 +111,14 @@ export const Route = createFileRoute("/dashboard")({
         </Column>
       </Column>
     )
+  },
+  loader: async () => {
+    const { data, error } = await rpc.analytics.list.get()
+
+    if (error || !data) {
+      return { analytics: [] }
+    }
+
+    return { analytics: data.analytics }
   },
 })
