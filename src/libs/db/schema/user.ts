@@ -1,3 +1,11 @@
+/**
+ * User, account, and session database schema.
+ *
+ * All primary keys default to the native `uuidv7()` function, which requires
+ * PostgreSQL 18+. On older versions `CREATE TABLE` itself fails unless an
+ * extension (e.g. pg_uuidv7) provides it.
+ */
+
 import { sql } from "drizzle-orm"
 import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { createSelectSchema } from "drizzle-zod"
