@@ -17,7 +17,7 @@ export const USER = pgTable("user", {
 })
 
 export const ACCOUNT = pgTable("account", {
-  createdAt: timestamp({ mode: "string" }).notNull().defaultNow(),
+  createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
