@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 import { Elysia, status, t } from "elysia"
-import { SESSION_COOKIE_NAME } from "#/libs/auth/cookie"
+import { COOKIE_NAME_SESSION } from "#/libs/auth/cookie"
 import { HTTP_STATUS_CODE } from "#/libs/auth/http-status"
 import { hashPassword } from "#/libs/auth/password"
 import { createSession } from "#/libs/auth/session"
@@ -64,7 +64,7 @@ export const routeSignUpCredential = new Elysia().post(
       return createdUser
     })
 
-    await createSession(cookie[SESSION_COOKIE_NAME], user.id)
+    await createSession(cookie[COOKIE_NAME_SESSION], user.id)
 
     return {
       user: {

@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm"
 import { Elysia, status, t } from "elysia"
-import { SESSION_COOKIE_NAME } from "#/libs/auth/cookie"
+import { COOKIE_NAME_SESSION } from "#/libs/auth/cookie"
 import { HTTP_STATUS_CODE } from "#/libs/auth/http-status"
 import { verifyPassword } from "#/libs/auth/password"
 import { createSession } from "#/libs/auth/session"
@@ -36,7 +36,7 @@ export const routeSignInCredential = new Elysia().post(
       return status(HTTP_STATUS_CODE["401_UNAUTHORIZED"], { error: "Invalid email or password" })
     }
 
-    await createSession(cookie[SESSION_COOKIE_NAME], row.user.id)
+    await createSession(cookie[COOKIE_NAME_SESSION], row.user.id)
 
     await db
       .update(USER)

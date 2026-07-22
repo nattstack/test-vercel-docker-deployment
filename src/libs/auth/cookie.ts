@@ -1,7 +1,7 @@
 import type { Cookie } from "elysia"
 import { isProduction } from "#/utils/environment"
 
-export const SESSION_COOKIE_NAME = "session"
+export const COOKIE_NAME_SESSION = "session"
 
 const SECONDS_PER_MINUTE = 60
 const MINUTES_PER_HOUR = 60

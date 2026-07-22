@@ -1,5 +1,5 @@
 import { Elysia, status, t } from "elysia"
-import { SESSION_COOKIE_NAME } from "#/libs/auth/cookie"
+import { COOKIE_NAME_SESSION } from "#/libs/auth/cookie"
 import { HTTP_STATUS_CODE } from "#/libs/auth/http-status"
 import { resolveSessionUser } from "#/libs/auth/session"
 import { sessionCookieSchema } from "#/libs/auth/session-cookie-schema"
@@ -19,7 +19,7 @@ const authErrorResponse = t.Object({
 export const routeMe = new Elysia().get(
   "/me",
   async ({ cookie }) => {
-    const user = await resolveSessionUser(cookie[SESSION_COOKIE_NAME])
+    const user = await resolveSessionUser(cookie[COOKIE_NAME_SESSION])
 
     if (!user) {
       return status(HTTP_STATUS_CODE["401_UNAUTHORIZED"], { error: "Unauthorized" })
