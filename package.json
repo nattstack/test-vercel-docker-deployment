@@ -10,6 +10,11 @@
     "check:lint": "oxlint",
     "check:lint:fix": "oxlint --fix --fix-suggestions --fix-dangerously",
     "check:type": "tsc",
+    "db:generate": "drizzle-kit generate --config=drizzle.config.ts",
+    "db:introspect": "drizzle-kit introspect --config=drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config=drizzle.config.ts",
+    "db:push": "drizzle-kit push --config=drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config=drizzle.config.ts --verbose",
     "dev": "portless test bun --bun vite dev",
     "preview": "portless test bun --bun vite preview",
     "update": "bun update --interactive --recursive"
