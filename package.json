@@ -1,0 +1,42 @@
+{
+  "name": "test",
+  "type": "module",
+  "scripts": {
+    "build": "bun --bun vite build",
+    "check": "bun run check:format && bun run check:lint && bun run check:type",
+    "check:fix": "bun run check:format:fix && bun run check:lint:fix && bun run check:type",
+    "check:format": "oxfmt --check",
+    "check:format:fix": "oxfmt",
+    "check:lint": "oxlint",
+    "check:lint:fix": "oxlint --fix --fix-suggestions --fix-dangerously",
+    "check:type": "tsc",
+    "dev": "portless test bun --bun vite dev",
+    "preview": "portless test bun --bun vite preview",
+    "update": "bun update --interactive --recursive"
+  },
+  "dependencies": {
+    "@nattstack/icons": "npm:nucleo-ui-outline-18@1.5.0",
+    "@nattstack/ui": "0.0.88",
+    "@tailwindcss/vite": "4.3.3",
+    "@tanstack/react-router": "1.170.18",
+    "@tanstack/react-start": "1.168.30",
+    "elysia": "1.4.29",
+    "nitro": "3.0.260610-beta",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "eslint-plugin-better-tailwindcss": "4.6.1",
+    "eslint-plugin-perfectionist": "5.10.0",
+    "lefthook": "2.1.10",
+    "oxfmt": "0.59.0",
+    "oxlint": "1.74.0",
+    "portless": "0.15.4",
+    "typescript": "7.0.2",
+    "vite": "8.1.5"
+  }
+}

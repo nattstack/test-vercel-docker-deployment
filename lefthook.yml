@@ -1,0 +1,9 @@
+pre-push:
+  parallel: true
+  commands:
+    format:
+      run: bun run check:format
+    lint:
+      run: bun run check:lint
+    type:
+      run: bun run check:type

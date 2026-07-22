@@ -1,0 +1,108 @@
+@import "tailwindcss" source("../");
+@import "@nattstack/ui/tailwind-colors";
+@import "@nattstack/ui/tailwind-tokenless-10";
+@import "@nattstack/ui/baseline";
+
+@theme {
+  --font-\*: initial;
+  --font-body: body, sans-serif;
+  --font-code: code, monospace;
+  --font-heading: heading, serif;
+}
+
+@font-face {
+  font-display: swap;
+  font-family: body;
+  font-style: normal;
+  font-weight: 100 900;
+  src: url("/fonts/body.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: code;
+  font-style: normal;
+  font-weight: 400;
+  src: url("/fonts/code.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: heading;
+  font-style: normal;
+  font-weight: 300;
+  src: url("/fonts/heading.woff2") format("woff2");
+}
+
+body {
+  /*
+      calt: Contextual alternates
+      cv01: Alternate one
+      cv05: Lower-case L with tail
+  */
+  font-feature-settings: "calt", "cv01", "cv05";
+  letter-spacing: -2%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: heading;
+}
+
+svg {
+  /* Prevent icons from shrinking */
+  flex-shrink: 0;
+
+  & > * {
+    stroke-width: 1.25px;
+  }
+}
+
+.ui-link {
+  text-decoration-color: var(--color-gray-6);
+  text-decoration-line: underline;
+  text-underline-offset: 2px;
+  transition-duration: 150ms;
+  transition-property: color, text-decoration-color, text-underline-offset;
+  width: fit-content;
+
+  &:hover {
+    @media (hover: hover) {
+      color: var(--color-primary);
+      text-decoration-color: transparent;
+      text-underline-offset: 4px;
+    }
+  }
+}
+
+/* Sugar high syntax highlighting */
+pre code {
+  --sh-class: color-mix(in oklab, var(--color-primary) 80%, var(--color-text-primary));
+  --sh-comment: var(--color-gray-10);
+  --sh-entity: color-mix(in oklab, var(--color-primary) 60%, var(--color-text-primary));
+  --sh-identifier: var(--color-text-primary);
+  --sh-jsxliterals: color-mix(in oklab, var(--color-primary) 70%, var(--color-text-primary));
+  --sh-keyword: var(--color-primary);
+  --sh-property: color-mix(in oklab, var(--color-primary) 85%, var(--color-text-primary));
+  --sh-sign: var(--color-gray-11);
+  --sh-string: color-mix(in oklab, var(--color-primary) 45%, var(--color-text-primary));
+}
+
+pre code .sh__line {
+  display: block;
+  min-height: 1lh;
+}
+
+/*
+    Motion's useScroll hook uses the document as its default scroll container.
+    A non-static position keeps that container as the offset parent, which makes
+    the footer's target-based scroll progress measurements line up with the
+    viewport.
+*/
+html {
+  position: relative;
+}
