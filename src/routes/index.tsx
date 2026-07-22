@@ -1,8 +1,14 @@
+// oxlint-disable unicorn/consistent-function-scoping
+
 import { Button, Column, Input, Label, Spacer } from "@nattstack/ui"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/")({
   component: function RouteComponent() {
+    function onClick(): void {
+      console.log("clicked")
+    }
+
     return (
       <Column className="h-dvh items-center justify-center">
         <Column className="w-full max-w-320">
@@ -16,7 +22,7 @@ export const Route = createFileRoute("/")({
           <Input id="password" type="text" value="password" />
 
           <Spacer height={24} />
-          <Button isFullWidth label="Login" size={48} />
+          <Button isFullWidth label="Login" onClick={onClick} size={48} />
         </Column>
       </Column>
     )
