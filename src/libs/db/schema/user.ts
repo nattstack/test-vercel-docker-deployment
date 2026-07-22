@@ -3,21 +3,21 @@ import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { createSelectSchema } from "drizzle-zod"
 
 export const USER = pgTable("user", {
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
   email: text().unique().notNull(),
   emailVerified: boolean().default(false).notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
   name: text().notNull(),
-  updatedAt: timestamp()
+  updatedAt: timestamp({ withTimezone: true })
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
 })
 
 export const ACCOUNT = pgTable("account", {
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
@@ -31,11 +31,11 @@ export const ACCOUNT = pgTable("account", {
 })
 
 export const ANALYTICS = pgTable("analytics", {
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
-  lastActiveAt: timestamp().defaultNow().notNull(),
+  lastActiveAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
   userId: uuid()
     .notNull()
     .unique()
@@ -43,7 +43,7 @@ export const ANALYTICS = pgTable("analytics", {
 })
 
 export const PROFILE = pgTable("profile", {
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
@@ -54,8 +54,8 @@ export const PROFILE = pgTable("profile", {
 })
 
 export const SESSION = pgTable("session", {
-  createdAt: timestamp().defaultNow().notNull(),
-  expiresAt: timestamp().notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+  expiresAt: timestamp({ withTimezone: true }).notNull(),
   hash: text().unique().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
