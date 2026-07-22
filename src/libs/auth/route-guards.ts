@@ -4,6 +4,8 @@ import { getCurrentUser, type CurrentUser } from "#/libs/auth/get-current-user"
 export async function requireGuest(): Promise<void> {
   const user = await getCurrentUser()
 
+  console.log("user", user)
+
   if (user) {
     throw redirect({ to: "/dashboard" })
   }
@@ -11,6 +13,8 @@ export async function requireGuest(): Promise<void> {
 
 export async function requireUser(): Promise<{ user: CurrentUser }> {
   const user = await getCurrentUser()
+
+  console.log("user", user)
 
   if (!user) {
     throw redirect({ to: "/sign-in" })
