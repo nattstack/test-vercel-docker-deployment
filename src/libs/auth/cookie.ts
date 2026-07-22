@@ -20,13 +20,13 @@ export function getSessionExpiresAt(): Date {
   return new Date(Date.now() + SESSION_MAX_AGE_SECONDS * MS_PER_SECOND)
 }
 
-export function setSessionCookie(cookie: Cookie<string | undefined>, rawToken: string): void {
+export function setSessionCookie(cookie: Cookie<string | undefined>, sessionSecret: string): void {
   cookie.set({
     httpOnly: true,
     maxAge: SESSION_MAX_AGE_SECONDS,
     path: "/",
     sameSite: "lax",
     secure: isProduction,
-    value: rawToken,
+    value: sessionSecret,
   })
 }

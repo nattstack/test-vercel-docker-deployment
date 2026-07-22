@@ -4,7 +4,7 @@
 
 import { Button, ButtonLink, Column, Input, Label, Spacer } from "@nattstack/ui"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
-import { useState, type FormEvent, type JSX } from "react"
+import { useState, type JSX, type SubmitEvent } from "react"
 import { requireGuest } from "#/libs/auth/route-guards"
 import { getCredentials, submitCredentials } from "#/libs/auth/submit-credentials"
 
@@ -12,16 +12,17 @@ export const Route = createFileRoute("/sign-in")({
   beforeLoad: requireGuest,
   component: function SignInRoute(): JSX.Element {
     const navigate = useNavigate()
+
     const [error, setError] = useState<string | undefined>()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    async function onSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
       event.preventDefault()
       setError(undefined)
       setIsSubmitting(true)
 
       const { email, password } = getCredentials(event.currentTarget)
-      const result = await submitCredentials("/api/auth/sign-in-credential", email, password)
+      const result = await submitCredentials("sign-in-credential", email, password)
 
       if (!result.ok) {
         setError(result.error)

@@ -6,6 +6,8 @@ import { Button, Column, Spacer } from "@nattstack/ui"
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router"
 import { useState, type JSX } from "react"
 import { requireUser } from "#/libs/auth/route-guards"
+import { rpc } from "#/libs/rpc/rpc"
+import { getRpcErrorMessage } from "#/libs/rpc/rpc-error-message"
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: requireUser,
@@ -22,10 +24,14 @@ export const Route = createFileRoute("/dashboard")({
       setIsSubmitting(true)
 
       try {
-        await fetch("/api/auth/sign-out", {
-          credentials: "include",
-          method: "POST",
-        })
+        const { error } = await rpc.auth["sign-out"].post()
+
+        if (error) {
+          setError(getRpcErrorMessage(error, "Something went wrong"))
+          setIsSubmitting(false)
+          return
+        }
+
         await navigate({ to: "/sign-in" })
       } catch {
         setError("Something went wrong")

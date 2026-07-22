@@ -69,10 +69,10 @@ export const PROFILE = pgTable("profile", {
 export const SESSION = pgTable("session", {
   createdAt: timestamp({ mode: "string" }).defaultNow().notNull(),
   expiresAt: timestamp({ mode: "string" }).notNull(),
+  hash: text().unique().notNull(),
   id: uuid()
     .default(sql`uuidv7()`)
     .primaryKey(),
-  tokenHash: text().unique().notNull(),
   userId: uuid()
     .notNull()
     .references(() => USER.id, { onDelete: "cascade" }),

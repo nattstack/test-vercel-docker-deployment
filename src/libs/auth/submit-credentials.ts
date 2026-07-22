@@ -1,16 +1,7 @@
-export type CredentialsAuthPath = "/api/auth/sign-in-credential" | "/api/auth/sign-up-credential"
+import { rpc } from "#/libs/rpc/rpc"
+import { getRpcErrorMessage } from "#/libs/rpc/rpc-error-message"
 
-interface AuthErrorResponse {
-  error?: string
-}
-
-interface AuthUserResponse {
-  user: {
-    email: string
-    id: string
-    name: string
-  }
-}
+export type CredentialsAuthPath = "sign-in-credential" | "sign-up-credential"
 
 export function getCredentials(form: HTMLFormElement): { email: string; password: string } {
   const formData = new FormData(form)
@@ -27,31 +18,15 @@ export async function submitCredentials(
   password: string,
 ): Promise<{ error?: string; ok: boolean }> {
   try {
-    const response = await fetch(path, {
-      body: JSON.stringify({ email, password }),
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
+    const { error } = await rpc.auth[path].post({ email, password })
 
-    if (!response.ok) {
-      let message = "Something went wrong"
-
-      try {
-        const data = (await response.json()) as AuthErrorResponse
-        if (data.error) {
-          message = data.error
-        }
-      } catch {
-        // Keep fallback message when the body is not JSON.
+    if (error) {
+      return {
+        error: getRpcErrorMessage(error, "Something went wrong"),
+        ok: false,
       }
-
-      return { error: message, ok: false }
     }
 
-    await (response.json() as Promise<AuthUserResponse>)
     return { ok: true }
   } catch {
     return { error: "Something went wrong", ok: false }

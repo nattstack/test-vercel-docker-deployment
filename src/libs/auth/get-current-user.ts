@@ -1,8 +1,4 @@
-import { createServerFn } from "@tanstack/react-start"
-import { getRequestHeader } from "@tanstack/react-start/server"
-import { SESSION_COOKIE_NAME } from "#/libs/auth/cookie"
-import { findUserBySessionToken } from "#/libs/auth/session"
-import type { User } from "#/libs/db/schema/user"
+import { rpc } from "#/libs/rpc/rpc"
 
 export interface CurrentUser {
   email: string
@@ -10,42 +6,12 @@ export interface CurrentUser {
   name: string
 }
 
-function parseCookieValue(cookieHeader: string | undefined, name: string): string | undefined {
-  if (!cookieHeader) {
+export async function getCurrentUser(): Promise<CurrentUser | undefined> {
+  const { data, error } = await rpc.auth.me.get()
+
+  if (error || !data) {
     return undefined
   }
 
-  const prefix = `${name}=`
-
-  for (const part of cookieHeader.split(";")) {
-    const trimmed = part.trim()
-
-    if (trimmed.startsWith(prefix)) {
-      return decodeURIComponent(trimmed.slice(prefix.length))
-    }
-  }
-
-  return undefined
+  return data.user
 }
-
-function toCurrentUser(user: User): CurrentUser {
-  return {
-    email: user.email,
-    id: user.id,
-    name: user.name,
-  }
-}
-
-export const getCurrentUser = createServerFn({ method: "GET" }).handler(
-  async (): Promise<CurrentUser | undefined> => {
-    const cookieHeader = getRequestHeader("cookie")
-    const rawToken = parseCookieValue(cookieHeader, SESSION_COOKIE_NAME)
-    const user = await findUserBySessionToken(rawToken)
-
-    if (!user) {
-      return undefined
-    }
-
-    return toCurrentUser(user)
-  },
-)
