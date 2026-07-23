@@ -5,6 +5,7 @@
 import { Button, ButtonLink, Column, Input, Label, Spacer } from "@nattstack/ui"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useState, type JSX, type SubmitEvent } from "react"
+import { messageForGitHubOAuthError } from "#/libs/auth/github-oauth-error"
 import { requireGuest } from "#/libs/auth/route-guards"
 import { getCredentials, submitCredentials } from "#/libs/auth/submit-credentials"
 
@@ -12,8 +13,9 @@ export const Route = createFileRoute("/sign-up")({
   beforeLoad: requireGuest,
   component: function SignUpRoute(): JSX.Element {
     const navigate = useNavigate()
+    const { error: oauthError } = Route.useSearch()
 
-    const [error, setError] = useState<string | undefined>()
+    const [error, setError] = useState<string | undefined>(messageForGitHubOAuthError(oauthError))
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     async function onSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
@@ -62,6 +64,15 @@ export const Route = createFileRoute("/sign-up")({
           <Spacer height={12} />
 
           <ButtonLink
+            href="/api/auth/github"
+            isFullWidth
+            label="Continue with GitHub"
+            size={48}
+            variant="secondary"
+          />
+          <Spacer height={12} />
+
+          <ButtonLink
             as={Link}
             isFullWidth
             label="Already have an account?"
@@ -73,4 +84,7 @@ export const Route = createFileRoute("/sign-up")({
       </Column>
     )
   },
+  validateSearch: (search: Record<string, unknown>): { error?: string } => ({
+    error: typeof search.error === "string" ? search.error : undefined,
+  }),
 })
