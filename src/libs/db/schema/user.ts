@@ -7,7 +7,7 @@
  */
 
 import { sql } from "drizzle-orm"
-import { boolean, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core"
+import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { createSelectSchema } from "drizzle-zod"
 
 export const USER = pgTable("user", {
@@ -24,28 +24,19 @@ export const USER = pgTable("user", {
     .$onUpdate(() => new Date()),
 })
 
-export const ACCOUNT = pgTable(
-  "account",
-  {
-    createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
-    id: uuid()
-      .default(sql`uuidv7()`)
-      .primaryKey(),
-    password: text(),
-    provider: text({ enum: ["credentials", "github", "google"] })
-      .default("credentials")
-      .notNull(),
-    providerAccountId: text(),
-    userId: uuid()
-      .notNull()
-      .references(() => USER.id, { onDelete: "cascade" }),
-  },
-  (table) => [
-    // Ensures one account row per provider identity (e.g. one GitHub user id),
-    // so the same OAuth subject cannot be linked to multiple app users.
-    unique("account_provider_provider_account_id_uidx").on(table.provider, table.providerAccountId),
-  ],
-)
+export const ACCOUNT = pgTable("account", {
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+  id: uuid()
+    .default(sql`uuidv7()`)
+    .primaryKey(),
+  password: text(),
+  provider: text({ enum: ["credentials", "github", "google"] })
+    .default("credentials")
+    .notNull(),
+  userId: uuid()
+    .notNull()
+    .references(() => USER.id, { onDelete: "cascade" }),
+})
 
 export const ANALYTICS = pgTable("analytics", {
   createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
